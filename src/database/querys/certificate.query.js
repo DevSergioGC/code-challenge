@@ -8,7 +8,7 @@ CREATE TABLE IF NOT EXISTS certificados (
   );
 `;
 
-module.exports = async() => {
+module.exports = async () => {
   await sequelize
     .query(createCertificatesQuery)
     .then(() => {
