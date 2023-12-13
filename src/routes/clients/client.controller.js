@@ -3,6 +3,10 @@ const {
   createClient,
   updateClient
 } = require('../../services/client.service');
+const {
+  validateClient,
+  validateUpdateClient
+} = require('../../utils/validation/validation');
 
 const httpGetAllClients = async (req, res) => {
   try {
@@ -13,6 +17,10 @@ const httpGetAllClients = async (req, res) => {
   }
 };
 const httpCreateClient = async (req, res) => {
+  const { error } = validateClient(req.body);
+  if (error) {
+    res.status(400).send({ error: error.details[0].message });
+  }
   try {
     const client = await createClient(req.body);
     res.status(201).json(client);
@@ -21,6 +29,10 @@ const httpCreateClient = async (req, res) => {
   }
 };
 const httpUpdateClient = async (req, res) => {
+  const { error } = validateUpdateClient(req.body);
+  if (error) {
+    res.status(400).send({ error: error.details[0].message });
+  }
   try {
     const { clientId } = req.params;
     const client = await updateClient(clientId, req.body);

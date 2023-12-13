@@ -1,5 +1,6 @@
 const DataTypes = require('sequelize');
 const sequelize = require('../db.js');
+const Client = require('./client.model.js');
 
 const Certificate = sequelize.define(
   'certificados',
@@ -9,12 +10,31 @@ const Certificate = sequelize.define(
       primaryKey: true,
       autoIncrement: true
     },
-    nombre: DataTypes.STRING,
-    fec_vencimiento: DataTypes.DATE
+    tasa: {
+      type: DataTypes.NUMBER,
+      allowNull: false
+    },
+    monto: {
+      type: DataTypes.NUMBER,
+      allowNull: false
+    },
+    fec_vencimiento: {
+      type: DataTypes.DATE,
+      allowNull: false
+    },
+    fec_creado: {
+      type: DataTypes.DATE,
+      defaultValue: DataTypes.NOW
+    }
   },
   {
     timestamps: false
   }
 );
+
+Certificate.belongsTo(Client, {
+  foreignKey: 'id_cliente',
+  as: 'cliente'
+});
 
 module.exports = Certificate;
