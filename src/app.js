@@ -5,6 +5,13 @@ const sequelize = require('./database/db');
 // ? Routes
 
 // ? Models
+const Clients = require('./database/querys/client.query');
+const Certificates = require('./database/querys/certificate.query');
+const ClientVSCertificate = require('./database/querys/clientVSCertificate.query');
+
+Clients();
+Certificates();
+ClientVSCertificate();
 
 const app = express();
 
