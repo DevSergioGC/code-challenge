@@ -7,7 +7,7 @@ CREATE TABLE IF NOT EXISTS cliente_certificado (
   );
 `;
 
-module.exports = async() => {
+module.exports = async () => {
   await sequelize
     .query(createClientCertificateQuery)
     .then(() => {

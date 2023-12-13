@@ -7,7 +7,7 @@ CREATE TABLE IF NOT EXISTS clientes (
   );
 `;
 
-module.exports = async() => {
+module.exports = async () => {
   await sequelize
     .query(createClientQuery)
     .then(() => {
