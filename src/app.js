@@ -3,6 +3,7 @@ const express = require('express');
 const sequelize = require('./database/db');
 
 // ? Routes
+const clientRoutes = require('./routes/clients/client.router');
 
 // ? Models
 const Clients = require('./database/querys/client.query');
@@ -17,7 +18,7 @@ const app = express();
 
 app.use(express.json());
 
-// app.use('/person', personRoutes);
+app.use('/cliente', clientRoutes);
 
 sequelize.sync({ force: false }).then(() => {
   console.log('Database and tables synced');
