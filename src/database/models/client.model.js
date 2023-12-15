@@ -12,7 +12,8 @@ const Client = sequelize.define(
     nombre: DataTypes.STRING
   },
   {
-    timestamps: false
+    timestamps: false,
+    freezeTableName: true
   }
 );
 
