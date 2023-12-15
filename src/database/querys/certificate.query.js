@@ -4,7 +4,7 @@ const createCertificatesQuery = `
 CREATE TABLE IF NOT EXISTS certificados (
     id SERIAL PRIMARY KEY,
     tasa DOUBLE PRECISION NOT NULL,
-    monto DOUBLE PRECISION NOT NULL,
+    monto_inicial DOUBLE PRECISION NOT NULL,
     fec_vencimiento DATE NOT NULL,
     fec_creado DATE DEFAULT NOW(),
     id_cliente INTEGER REFERENCES clientes(id)

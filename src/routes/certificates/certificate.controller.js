@@ -1,7 +1,11 @@
 const {
   requestCertificate,
   getCertificates,
-  getCertificateById
+  getCertificateById,
+  getCertificateBalanceById,
+  clientCertificates,
+  depositCertificate,
+  withdrawCertificate
 } = require('../../services/certificate.service');
 const { validateCertificate } = require('../../utils/validation/validation');
 
@@ -34,9 +38,49 @@ const httpGetCertificateById = async (req, res) => {
     res.status(500).json({ message: error.message });
   }
 };
+const httpGetCertificateBalanceById = async (req, res) => {
+  try {
+    const { certificateId } = req.params;
+    const certificate = await getCertificateBalanceById(certificateId);
+    res.status(200).json(certificate);
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+};
+const httpClientCertificates = async (req, res) => {
+  try {
+    const { clientId } = req.params;
+    const certificates = await clientCertificates(clientId);
+    res.status(200).json(certificates);
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+};
+const httpDepositCertificate = async (req, res) => {
+  try {
+    const { amount, certificateId } = req.body;
+    const certificate = await depositCertificate(certificateId, amount);
+    res.status(200).json(certificate);
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+};
+const httpWithdrawCertificate = async (req, res) => {
+  try {
+    const { amount, certificateId } = req.body;
+    const certificate = await withdrawCertificate(certificateId, amount);
+    res.status(200).json(certificate);
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+};
 
 module.exports = {
   httpRequestCertificate,
   httpGetAllCertificates,
-  httpGetCertificateById
+  httpGetCertificateById,
+  httpGetCertificateBalanceById,
+  httpClientCertificates,
+  httpDepositCertificate,
+  httpWithdrawCertificate
 };
