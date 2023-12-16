@@ -1,15 +1,18 @@
 const DataTypes = require('sequelize');
 const sequelize = require('../db.js');
 
-const Client = sequelize.define(
-  'clientes',
+const TransactionType = sequelize.define(
+  'tipo_transaccion',
   {
     id: {
       type: DataTypes.INTEGER,
       primaryKey: true,
       autoIncrement: true
     },
-    nombre: DataTypes.STRING
+    tipo_transaccion: {
+      type: DataTypes.STRING,
+      allowNull: false
+    }
   },
   {
     timestamps: false,
@@ -17,4 +20,4 @@ const Client = sequelize.define(
   }
 );
 
-module.exports = Client;
+module.exports = TransactionType;
