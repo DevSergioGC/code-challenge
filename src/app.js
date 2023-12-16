@@ -1,4 +1,3 @@
-/* eslint-disable no-unused-vars */
 const express = require('express');
 const sequelize = require('./database/db');
 
@@ -9,9 +8,13 @@ const certificateRoutes = require('./routes/certificates/certificate.router');
 // ? Models
 const Clients = require('./database/querys/client.query');
 const Certificates = require('./database/querys/certificate.query');
+const CertificateVsTransaction = require('./database/querys/certificateVsTransaction.query');
+const TransactionType = require('./database/querys/transactionType.query');
 
 Clients();
 Certificates();
+CertificateVsTransaction();
+TransactionType();
 
 const app = express();
 
