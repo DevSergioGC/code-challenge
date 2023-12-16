@@ -1,24 +1,27 @@
-/* eslint-disable no-unused-vars */
 const express = require('express');
 const sequelize = require('./database/db');
 
 // ? Routes
 const clientRoutes = require('./routes/clients/client.router');
+const certificateRoutes = require('./routes/certificates/certificate.router');
 
 // ? Models
 const Clients = require('./database/querys/client.query');
 const Certificates = require('./database/querys/certificate.query');
-const ClientVSCertificate = require('./database/querys/clientVSCertificate.query');
+const CertificateVsTransaction = require('./database/querys/certificateVsTransaction.query');
+const TransactionType = require('./database/querys/transactionType.query');
 
 Clients();
 Certificates();
-ClientVSCertificate();
+CertificateVsTransaction();
+TransactionType();
 
 const app = express();
 
 app.use(express.json());
 
 app.use('/cliente', clientRoutes);
+app.use('/certificado', certificateRoutes);
 
 sequelize.sync({ force: false }).then(() => {
   console.log('Database and tables synced');

@@ -9,11 +9,26 @@ const Certificate = sequelize.define(
       primaryKey: true,
       autoIncrement: true
     },
-    nombre: DataTypes.STRING,
-    fec_vencimiento: DataTypes.DATE
+    tasa: {
+      type: DataTypes.DOUBLE,
+      allowNull: false
+    },
+    monto_inicial: {
+      type: DataTypes.DOUBLE,
+      allowNull: false
+    },
+    fec_vencimiento: {
+      type: DataTypes.DATE,
+      allowNull: false
+    },
+    fec_creado: {
+      type: DataTypes.DATE,
+      defaultValue: DataTypes.NOW
+    }
   },
   {
-    timestamps: false
+    timestamps: false,
+    freezeTableName: true
   }
 );
 
