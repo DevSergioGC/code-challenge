@@ -2,6 +2,7 @@ const sequelize = require('../db');
 
 const createTransactionsVsCertificateQuery = `
 CREATE TABLE IF NOT EXISTS certificado_vs_transaccion (
+    id SERIAL PRIMARY KEY,
     id_tipo_transaccion INTEGER NOT NULL REFERENCES tipo_transaccion(id),
     id_certificado INTEGER NOT NULL REFERENCES certificados(id),
     monto DOUBLE PRECISION NOT NULL,
