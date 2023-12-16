@@ -1,18 +1,68 @@
-const Certificate = require('../database/models/certificate.model');
-const { getRevenue } = require('../utils/utils');
+const {
+  Certificate,
+  Client,
+  CertificateVsTransaction,
+  TransactionType
+} = require('../database/models/index');
+const { addVirtualColumns } = require('../utils/utils');
 
 const requestCertificate = async (certificate) => {
-  const newCertificate = await Certificate.create(certificate);
-  return newCertificate;
+  try {
+    const newCertificate = await Certificate.create(certificate);
+    return { status: 201, response: { certificado: newCertificate } };
+  } catch (error) {
+    return { status: 500, response: { error: error.message } };
+  }
 };
 const getCertificates = async () => {
-  const certificates = await Certificate.findAll();
-  return certificates;
+  try {
+    const certificates = await Certificate.findAll({
+      include: {
+        model: Client,
+        as: 'cliente'
+      },
+      attributes: {
+        exclude: ['id_cliente']
+      }
+    });
+    if (certificates.length > 0) {
+      return { status: 200, response: { certificado: certificates } };
+    } else {
+      return { status: 404, response: { message: 'No certificates found' } };
+    }
+  } catch (error) {
+    return { status: 500, response: { error: error.message } };
+  }
 };
 const getCertificateById = async (certificateId) => {
-  const certificate = await Certificate.findByPk(certificateId);
-  const revenue = getRevenue(certificate);
-  return { certificate, revenue };
+  try {
+    let certificate = await Certificate.findByPk(certificateId, {
+      include: [
+        {
+          model: Client,
+          as: 'cliente'
+        },
+        {
+          model: TransactionType,
+          as: 'tipo_transaccion',
+          through: {
+            model: CertificateVsTransaction,
+            attributes: ['monto']
+          }
+        }
+      ],
+      attributes: {
+        exclude: ['id_cliente']
+      }
+    });
+    certificate = await addVirtualColumns(
+      Array(certificate),
+      CertificateVsTransaction
+    );
+    return certificate;
+  } catch (error) {
+    return { status: 500, response: { error: error.message } };
+  }
 };
 
 module.exports = {
