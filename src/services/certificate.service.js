@@ -8,6 +8,10 @@ const { addVirtualColumns } = require('../utils/utils');
 
 const requestCertificate = async (certificate) => {
   try {
+    const client = await Client.findByPk(certificate.id_cliente);
+    if (!client || Array(client).length === 0) {
+      return { status: 404, response: { message: 'Client not found' } };
+    }
     const newCertificate = await Certificate.create(certificate);
     return { status: 201, response: { certificado: newCertificate } };
   } catch (error) {
@@ -55,6 +59,12 @@ const getCertificateById = async (certificateId) => {
         exclude: ['id_cliente']
       }
     });
+    if (!certificate || Array(certificate).length === 0) {
+      return {
+        status: 404,
+        response: { message: 'Certificate not found' }
+      };
+    }
     certificate = await addVirtualColumns(
       Array(certificate),
       CertificateVsTransaction

@@ -31,6 +31,12 @@ const getCertificateBalanceById = async (certificateId) => {
         }
       ]
     });
+    if (!certificate || Array(certificate).length === 0) {
+      return {
+        status: 404,
+        response: { message: 'Certificate not found' }
+      };
+    }
     certificate = await addVirtualColumns(
       Array(certificate),
       CertificateVsTransaction
@@ -64,6 +70,12 @@ const clientCertificates = async (clientId) => {
         }
       ]
     });
+    if (!certificates || certificates.length === 0) {
+      return {
+        status: 404,
+        response: { message: 'This client does not have certificates' }
+      };
+    }
     certificates = await addVirtualColumns(
       certificates,
       CertificateVsTransaction
@@ -99,6 +111,12 @@ const depositCertificate = async (certificateId, amount) => {
       response: { message: 'Certificate has already finished' }
     };
   } else {
+    if (!certificate || Array(certificate).length === 0) {
+      return {
+        status: 404,
+        response: { message: 'Certificate not found' }
+      };
+    }
     await CertificateVsTransaction.create({
       id_certificado: certificateId,
       id_tipo_transaccion: 1,
@@ -127,6 +145,12 @@ const withdrawCertificate = async (certificateId, amount) => {
       }
     ]
   });
+  if (!certificate || Array(certificate).length === 0) {
+    return {
+      status: 404,
+      response: { message: 'Certificate not found' }
+    };
+  }
   const penalty = isCertificateFinished(certificate.final_date) ? 0 : 0.65;
   const total = amount + amount * penalty;
   await CertificateVsTransaction.create({
