@@ -1,5 +1,7 @@
 const express = require('express');
 const sequelize = require('./database/db');
+const swaggerUi = require('swagger-ui-express');
+const YAML = require('yamljs');
 
 // ? Routes
 const clientRoutes = require('./routes/clients/client.router');
@@ -18,10 +20,13 @@ TransactionType();
 
 const app = express();
 
+const swaggerDocument = YAML.load('./openapi.yaml');
+
 app.use(express.json());
 
 app.use('/cliente', clientRoutes);
 app.use('/certificado', certificateRoutes);
+app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerDocument));
 
 sequelize.sync({ force: false }).then(() => {
   console.log('Database and tables synced');
