@@ -255,7 +255,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/CertificateDetailResponse'
+                $ref: '#/components/schemas/DepositResponse'
         '404':
           description: No se encontró el cliente/certificado
           content:
@@ -367,22 +367,18 @@ components:
       type: object
       description: Detalle de transaccion
       properties:
-        id:
-          type: integer
-          description: ID de la transacción
-          example: 1
+        monto:
+          type: number
+          description: Monto de la transacción
+          example: 1000
         tipo_transaccion:
-          type: string
-          description: Nombre del tipo de transacción realizada
-          example: Depósito
-        certificado_vs_transaccion:
           type: object
-          description: Transacciones realizadas en ese tipo de transaccion
+          description: Tipo de transacción realizada
           properties:
-            monto:
-              type: number
-              description: Monto de la transacción
-              example: 1000
+            tipo_transaccion:
+              type: string
+              description: Nombre del tipo de transacción
+              example: Depósito
     CertificateDetailClient:
       type: object
       properties:
@@ -406,18 +402,10 @@ components:
           type: date
           description: Fecha de creación del certificado
           example: 2021-01-01
-        id_cliente: 
-          type: integer
-          description: ID del cliente al que el certificado pertenece
-          example: 1
         cliente:
           type: object
           description: Cliente al que el certificado pertenece
-          properties:
-            nombre: 
-              type: string
-              description: Nombre del cliente
-              example: Sergio
+          $ref: '#/components/schemas/Client'
     CertificateDetail:
       type: object
       properties:
@@ -445,14 +433,14 @@ components:
           type: object
           description: Cliente al que el certificado pertenece
           $ref: '#/components/schemas/Client'
-        tipo_transaccion:
+        certificado_vs_transaccions:
           type: array
           description: Tipos de transacciones realizadas en el certificado
           items:
             $ref: '#/components/schemas/TransactionDetail'
-        monto_actual:
+        monto_total:
           type: number
-          description: Monto actual del certificado (incluyendo los depósito y retiros realizados)
+          description: Monto total del certificado (incluyendo los depósito y retiros realizados, así como lo generado mediante intereses/tasas)
           example: 1000
         informe:
           type: object
@@ -474,6 +462,18 @@ components:
               type: number
               description: Cantidad de meses que se están o han contado para generar las ganancias mediante tasas/intereses
               example: 12
+        transacciones:
+          type: object
+          description: Total de depositos y retiros realizados en el certificado
+          properties:
+            total_depositado:
+              type: number
+              description: Total de dinero depositado en el certificado
+              example: 1000
+            total_retirado:
+              type: number
+              description: Total de dinero retirado en el certificado
+              example: 500
         estado:
           type: string
           description: Estado del certificado
@@ -538,6 +538,21 @@ components:
               type: string
               description: Mensaje de error
               example: No se encontró el objeto solicitado
+    DepositResponse:
+      type: object
+      properties:
+        status:
+          type: number
+          description: Http status code
+          example: 201
+        response:
+          type: object
+          description: Respuesta a la peticion hecha
+          properties:
+            deposito:
+              type: object
+              description: Informacion del depósito realizado
+              $ref: '#/components/schemas/Transaction'
     WithdrawalResponse:
       type: object
       properties:
@@ -561,7 +576,7 @@ components:
               type: string
               description: Estado del certificado
               example: Activo
-            certificado:
+            retiro:
               type: object
               description: Certificado/s
-              $ref: '#/components/schemas/CertificateDetail' 
+              $ref: '#/components/schemas/Transaction'
