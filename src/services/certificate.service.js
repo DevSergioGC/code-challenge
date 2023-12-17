@@ -4,7 +4,7 @@ const {
   CertificateVsTransaction,
   TransactionType
 } = require('../database/models/index');
-const { addVirtualColumns } = require('../utils/utils');
+const { addVirtualColumns, getCertificateQuery } = require('../utils/utils');
 
 const requestCertificate = async (certificate) => {
   try {
@@ -38,27 +38,15 @@ const getCertificates = async () => {
     return { status: 500, response: { error: error.message } };
   }
 };
-const getCertificateById = async (certificateId) => {
+const getCertificateRevenueById = async (certificateId) => {
   try {
-    let certificate = await Certificate.findByPk(certificateId, {
-      include: [
-        {
-          model: Client,
-          as: 'cliente'
-        },
-        {
-          model: TransactionType,
-          as: 'tipo_transaccion',
-          through: {
-            model: CertificateVsTransaction,
-            attributes: ['monto']
-          }
-        }
-      ],
-      attributes: {
-        exclude: ['id_cliente']
-      }
-    });
+    let certificate = await getCertificateQuery(
+      certificateId,
+      Certificate,
+      Client,
+      TransactionType,
+      CertificateVsTransaction
+    );
     if (!certificate || Array(certificate).length === 0) {
       return {
         status: 404,
@@ -78,5 +66,5 @@ const getCertificateById = async (certificateId) => {
 module.exports = {
   requestCertificate,
   getCertificates,
-  getCertificateById
+  getCertificateRevenueById
 };
