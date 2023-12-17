@@ -1,5 +1,4 @@
 const express = require('express');
-const sequelize = require('./database/db');
 const swaggerUi = require('swagger-ui-express');
 const YAML = require('yamljs');
 
@@ -14,9 +13,21 @@ const CertificateVsTransaction = require('./database/querys/certificateVsTransac
 const TransactionType = require('./database/querys/transactionType.query');
 
 Clients();
-Certificates();
-CertificateVsTransaction();
-TransactionType();
+
+setTimeout(() => {
+  Certificates();
+  console.log('Creating certificates table...');
+}, 4000);
+
+setTimeout(() => {
+  TransactionType();
+  console.log('Creating transaction type table...');
+}, 5000);
+
+setTimeout(() => {
+  CertificateVsTransaction();
+  console.log('Creating certificate vs transaction table...');
+}, 6000);
 
 const app = express();
 
@@ -27,9 +38,5 @@ app.use(express.json());
 app.use('/cliente', clientRoutes);
 app.use('/certificado', certificateRoutes);
 app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerDocument));
-
-sequelize.sync({ force: false }).then(() => {
-  console.log('Database and tables synced');
-});
 
 module.exports = app;

@@ -9,16 +9,6 @@ const CertificateVsTransaction = sequelize.define(
       primaryKey: true,
       autoIncrement: true
     },
-    id_tipo_transaccion: {
-      type: DataTypes.INTEGER,
-      allowNull: false,
-      unique: false
-    },
-    id_certificado: {
-      type: DataTypes.INTEGER,
-      allowNull: false,
-      unique: false
-    },
     monto: {
       type: DataTypes.DOUBLE,
       allowNull: false
@@ -26,7 +16,13 @@ const CertificateVsTransaction = sequelize.define(
   },
   {
     timestamps: false,
-    freezeTableName: true
+    freezeTableName: true,
+    constraints: [
+      {
+        unique: false,
+        fields: ['id_certificado', 'id_tipo_transaccion']
+      }
+    ]
   }
 );
 

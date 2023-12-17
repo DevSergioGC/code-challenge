@@ -7,12 +7,15 @@ CREATE TABLE IF NOT EXISTS certificados (
     monto_inicial DOUBLE PRECISION NOT NULL,
     fec_vencimiento DATE NOT NULL,
     fec_creado DATE DEFAULT NOW(),
-    id_cliente INTEGER REFERENCES clientes(id)
-  );
-`;
+    id_cliente INTEGER NOT NULL,
+    CONSTRAINT fk_cliente
+      FOREIGN KEY(id_cliente)
+      REFERENCES clientes(id)
+      ON DELETE CASCADE
+  );`;
 
-module.exports = async () => {
-  await sequelize
+module.exports = () => {
+  sequelize
     .query(createCertificatesQuery)
     .then(() => {
       console.log('Certificates table created successfully');
