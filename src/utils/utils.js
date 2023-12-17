@@ -76,7 +76,7 @@ const getTransactions = async (table, certificateId, transactionTypeId) => {
   }
 };
 
-const addNewAmountColumn = async (certificateTable, transactionsTable) => {
+const getTotalAmount = async (certificateTable, transactionsTable) => {
   const { dinero_ganado } = getActualBalance(certificateTable);
   const deposits = await getTransactions(
     transactionsTable,
@@ -89,15 +89,24 @@ const addNewAmountColumn = async (certificateTable, transactionsTable) => {
     2
   );
 
+  return (
+    certificateTable.monto_inicial + dinero_ganado + deposits - withdrawals
+  );
+};
+
+const addNewAmountColumn = async (certificateTable, transactionsTable) => {
   if (certificateTable.length <= 1 || certificateTable.length === undefined) {
-    certificateTable.monto_actual =
-      certificateTable.monto_inicial + dinero_ganado + deposits - withdrawals;
+    certificateTable.monto_total = await getTotalAmount(
+      certificateTable,
+      transactionsTable
+    );
   } else {
     certificateTable.forEach(async (row) => {
       const certificate = row.get();
-      const { dinero_ganado } = getActualBalance(certificate);
-      certificate.monto_actual =
-        certificate.monto_inicial + dinero_ganado + deposits - withdrawals;
+      certificate.monto_total = await getTotalAmount(
+        certificateTable,
+        transactionsTable
+      );
     });
   }
   return certificateTable;
@@ -127,6 +136,28 @@ const addNewStateColumn = (table) => {
   return table;
 };
 
+const addTransactionColumn = async (certificateTable, transactionTable) => {
+  const column = {
+    total_depositado:
+      (await getTransactions(transactionTable, certificateTable.id, 1)) === null
+        ? 0
+        : await getTransactions(transactionTable, certificateTable.id, 1),
+    total_retirado:
+      (await getTransactions(transactionTable, certificateTable.id, 2)) === null
+        ? 0
+        : await getTransactions(transactionTable, certificateTable.id, 2)
+  };
+  if (certificateTable.length <= 1 || certificateTable.length === undefined) {
+    certificateTable.transacciones = column;
+  } else {
+    certificateTable.forEach((row) => {
+      const certificate = row.get();
+      certificate.transacciones = column;
+    });
+  }
+  return certificateTable;
+};
+
 const addVirtualColumns = async (certificateTable, transactionTable) => {
   if (certificateTable && certificateTable.length > 0) {
     certificateTable = certificateTable.map(async (certificate) => {
@@ -137,6 +168,10 @@ const addVirtualColumns = async (certificateTable, transactionTable) => {
       );
       certificateData = await addNewDetailColumn(certificateData);
       certificateData = await addNewStateColumn(certificateData);
+      certificateData = await addTransactionColumn(
+        certificateData,
+        transactionTable
+      );
       return certificateData;
     });
     return {
@@ -157,6 +192,37 @@ const addVirtualColumns = async (certificateTable, transactionTable) => {
   }
 };
 
+const getCertificateQuery = async (
+  id,
+  certificateTable,
+  clientTable,
+  transactionTypeTable,
+  transactionsTable
+) => {
+  const certificate = await certificateTable.findByPk(id, {
+    attributes: {
+      exclude: ['id_cliente']
+    },
+    include: [
+      {
+        model: clientTable,
+        as: 'cliente'
+      },
+      {
+        model: transactionsTable,
+        attributes: ['monto'],
+        include: [
+          {
+            model: transactionTypeTable,
+            attributes: ['tipo_transaccion']
+          }
+        ]
+      }
+    ]
+  });
+  return certificate;
+};
+
 module.exports = {
   getRevenue,
   getActualBalance,
@@ -166,5 +232,7 @@ module.exports = {
   addNewAmountColumn,
   addNewDetailColumn,
   addNewStateColumn,
-  addVirtualColumns
+  addVirtualColumns,
+  getCertificateQuery,
+  getTotalAmount
 };
