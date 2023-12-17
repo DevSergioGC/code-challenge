@@ -8,6 +8,11 @@ Certificate.belongsTo(Client, {
   as: 'cliente'
 });
 
+Client.hasMany(Certificate, {
+  foreignKey: 'id_cliente',
+  as: 'certificados'
+});
+
 Certificate.belongsToMany(TransactionType, {
   through: CertificateVsTransaction,
   foreignKey: 'id_certificado',
@@ -18,6 +23,20 @@ TransactionType.belongsToMany(Certificate, {
   through: CertificateVsTransaction,
   foreignKey: 'id_tipo_transaccion',
   as: 'transaccion'
+});
+
+Certificate.hasMany(CertificateVsTransaction, { foreignKey: 'id_certificado' });
+
+CertificateVsTransaction.belongsTo(Certificate, {
+  foreignKey: 'id_certificado'
+});
+
+TransactionType.hasMany(CertificateVsTransaction, {
+  foreignKey: 'id_tipo_transaccion'
+});
+
+CertificateVsTransaction.belongsTo(TransactionType, {
+  foreignKey: 'id_tipo_transaccion'
 });
 
 module.exports = {
