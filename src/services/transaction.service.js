@@ -127,7 +127,7 @@ const withdrawCertificate = async (certificateId, amount) => {
       certificate,
       CertificateVsTransaction
     );
-    const penalty = isCertificateFinished(certificate.final_date) ? 0 : 0.65;
+    const penalty = isCertificateFinished(certificate.final_date) ? 0 : 0.10;
     const total = amount + amount * penalty;
 
     if (certificateTotal <= 0 || total > certificateTotal) {
