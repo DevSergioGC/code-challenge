@@ -1,0 +1,567 @@
+openapi: 3.0.0
+info:
+  title: Banfondesa Code Challenge
+  version: 1.0.0
+  description: REST API de certificados. El usuario con esta API podrá crear, obtener y editar clientes; solicitar, obtener, ver ganancias, obtener ganancias, realizar depósitos y retiros de certificados.
+  contact:
+    email: sergiocamachog12@gmail.com
+servers:
+  - url: http://localhost:8000
+    description: Local server
+paths:
+  /cliente/created:
+    post:
+      summary: Crear cliente
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                nombre:
+                  type: string
+                  description: Nombre del cliente
+                  example: Sergio
+      responses:
+        '201':
+          description: Cliente creado
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ClientResponse'
+        '500':
+          description: Error interno del servidor
+  /cliente/list:
+    get:
+      summary: Obtener lista de clientes
+      responses:
+        '200':
+          description: Lista de clientes
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/ClientResponse'
+        '404':
+          description: No se encontraron clientes
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/NotFounResponse'
+        '500':
+          description: Error interno del servidor
+  /cliente/update/{clientID}:
+    patch:
+      summary: Actualizar cliente
+      parameters:
+        - in: path
+          name: clientID
+          required: true
+          description: ID del cliente
+          schema:
+            type: integer
+            example: 1
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                nombre:
+                  type: string
+                  description: Nombre del cliente
+                  example: Sergio
+      responses:
+        '200':
+          description: Cliente actualizado
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ClientResponse'
+        '404':
+          description: No se encontró el cliente
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/NotFounResponse'
+        '500':
+          description: Error interno del servidor
+  /certificado/request:
+    post:
+      summary: Solicitar certificado
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                id_cliente:
+                  type: integer
+                  description: ID del cliente
+                  example: 1
+                tasa:
+                  type: number
+                  description: Tasa del certificado
+                  example: 0.05
+                monto_inicial:
+                  type: number
+                  description: Monto inicial/base del certificado
+                  example: 1000
+                fec_vencimiento:
+                  type: date
+                  description: Fecha de vencimiento del certificado
+                  example: 2021-12-31
+      responses:
+        '201':
+          description: Certificado solicitado
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Certificate'
+        '404':
+          description: No se encontró el cliente
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/NotFounResponse'
+        '500':
+          description: Error interno del servidor
+  /certificado/list:
+    get:
+      summary: Obtener lista de certificados
+      responses:
+        '200':
+          description: Lista de certificados
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/CertificateClientResponse'
+        '404':
+          description: No se encontraron certificados
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/NotFounResponse'
+        '500':
+          description: Error interno del servidor
+  /certificado/ganancia/{certificateID}:
+    get:
+      summary: Obtener ganancias de un certificado
+      parameters:
+        - in: path
+          name: certificateID
+          required: true
+          description: ID del certificado
+          schema:
+            type: integer
+            example: 1
+      responses:
+        '200':
+          description: Ganancias del certificado
+          content:
+            application/json:
+              schema:
+                type: object
+                $ref: '#/components/schemas/CertificateDetailResponse'
+        '404':
+          description: No se encontró el certificado
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/NotFounResponse'
+        '500':
+          description: Error interno del servidor
+  /certificado/balance/{certificateID}:
+    get:
+      summary: Obtener balance actual de un certificado
+      parameters:
+        - in: path
+          name: certificateID
+          required: true
+          description: ID del certificado
+          schema:
+            type: integer
+            example: 1
+      responses:
+        '200':
+          description: Balance del certificado
+          content:
+            application/json:
+              schema:
+                type: object
+                $ref: '#/components/schemas/CertificateDetailResponse'
+        '404':
+          description: No se encontró el certificado
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/NotFounResponse'
+        '500':
+          description: Error interno del servidor
+  /certificado/balancecliente/{clientID}:
+    get:
+      summary: Obtener balance actual de un cliente
+      parameters:
+        - in: path
+          name: clientID
+          required: true
+          description: ID del cliente
+          schema:
+            type: integer
+            example: 1
+      responses:
+        '200':
+          description: Balance del cliente
+          content:
+            application/json:
+              schema:
+                type: object
+                $ref: '#/components/schemas/CertificateDetailResponse'
+        '404':
+          description: No se encontró el cliente
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/NotFounResponse'
+        '500':
+          description: Error interno del servidor
+  /certificado/deposito:
+    post:
+      summary: Realizar depósito en un certificado
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                id_certificado:
+                  type: integer
+                  description: ID del certificado
+                  example: 1
+                monto:
+                  type: number
+                  description: Monto del depósito
+                  example: 1000
+      responses:
+        '201':
+          description: Depósito realizado
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CertificateDetailResponse'
+        '404':
+          description: No se encontró el cliente/certificado
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/NotFounResponse'
+        '500':
+          description: Error interno del servidor
+  /certificado/retiro:
+    post:
+      summary: Realizar retiro en un certificado
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                id_certificado:
+                  type: integer
+                  description: ID del certificado
+                  example: 1
+                monto:
+                  type: number
+                  description: Monto del retiro
+                  example: 1000
+      responses:
+        '201':
+          description: Retiro realizado
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/WithdrawalResponse'
+        '404':
+          description: No se encontró el cliente/certificado
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/NotFounResponse'
+        '500':
+          description: Error interno del servidor
+components:
+  schemas:
+    Client:
+      type: object
+      properties:
+        id:
+          type: integer
+          description: ID del cliente
+          example: 1
+        nombre:
+          type: string
+          description: Nombre del cliente
+          example: Sergio
+    Certificate:
+      type: object
+      properties:
+        id:
+          type: integer
+          description: ID del certificado
+          example: 1
+        tasa:
+          type: number
+          description: Tasa del certificado
+          example: 0.05
+        monto_inicial:
+          type: number
+          description: Monto inicial/base del certificado
+          example: 1000
+        fec_vencimiento:
+          type: date
+          description: Fecha de vencimiento del certificado
+          example: 2021-12-31
+        fec_creado:
+          type: date
+          description: Fecha de creación del certificado
+          example: 2021-01-01
+    TransactionType:
+      type: object
+      properties:
+        id:
+          type: integer
+          description: ID del tipo de transacción
+          example: 1
+        nombre:
+          type: string
+          description: Nombre del tipo de transacción
+          example: Depósito
+    Transaction:
+      type: object
+      properties:
+        id:
+          type: integer
+          description: ID de la transacción
+          example: 1
+        id_tipo_transaccion:
+          type: integer
+          description: ID del tipo de transacción realizada
+          example: 1
+        id_certificado:
+          type: integer
+          description: ID del certificado en el que se realizó la transacción
+          example: 1
+        monto:
+          type: number
+          description: Monto de la transacción
+          example: 1000
+    TransactionDetail:
+      type: object
+      description: Detalle de transaccion
+      properties:
+        id:
+          type: integer
+          description: ID de la transacción
+          example: 1
+        tipo_transaccion:
+          type: string
+          description: Nombre del tipo de transacción realizada
+          example: Depósito
+        certificado_vs_transaccion:
+          type: object
+          description: Transacciones realizadas en ese tipo de transaccion
+          properties:
+            monto:
+              type: number
+              description: Monto de la transacción
+              example: 1000
+    CertificateDetailClient:
+      type: object
+      properties:
+        id:
+          type: integer
+          description: ID del certificado
+          example: 1
+        tasa:
+          type: number
+          description: Tasa del certificado
+          example: 0.05
+        monto_inicial:
+          type: number
+          description: Monto inicial/base del certificado
+          example: 1000
+        fec_vencimiento:
+          type: date
+          description: Fecha de vencimiento del certificado
+          example: 2021-12-31
+        fec_creado:
+          type: date
+          description: Fecha de creación del certificado
+          example: 2021-01-01
+        id_cliente: 
+          type: integer
+          description: ID del cliente al que el certificado pertenece
+          example: 1
+        cliente:
+          type: object
+          description: Cliente al que el certificado pertenece
+          properties:
+            nombre: 
+              type: string
+              description: Nombre del cliente
+              example: Sergio
+    CertificateDetail:
+      type: object
+      properties:
+        id:
+          type: integer
+          description: ID del certificado
+          example: 1
+        tasa:
+          type: number
+          description: Tasa del certificado
+          example: 0.05
+        monto_inicial:
+          type: number
+          description: Monto inicial/base del certificado
+          example: 1000
+        fec_vencimiento:
+          type: date
+          description: Fecha de vencimiento del certificado
+          example: 2021-12-31
+        fec_creado:
+          type: date
+          description: Fecha de creación del certificado
+          example: 2021-01-01
+        cliente:
+          type: object
+          description: Cliente al que el certificado pertenece
+          $ref: '#/components/schemas/Client'
+        tipo_transaccion:
+          type: array
+          description: Tipos de transacciones realizadas en el certificado
+          items:
+            $ref: '#/components/schemas/TransactionDetail'
+        monto_actual:
+          type: number
+          description: Monto actual del certificado (incluyendo los depósito y retiros realizados)
+          example: 1000
+        informe:
+          type: object
+          description: Informaciones extras del certificado
+          properties:
+            dinero_ganado:
+              type: number
+              description: Dinero generado por el certificado mediante la tasa exclusivamente
+              example: 50
+            balance_actual:
+              type: number
+              description: Balance actual del certificado (excluyendo los depósito y retiros realizados y solo contemplando el monto inicial/base + lo generado por los intereses/tasas)
+              example: 1050
+            ganancia_mensual:
+              type: number
+              description: Cantidad de dinero que genera el certificado mensualmente (tomando en cuenta la tasa y el monto inicial/base)
+              example: 4.16
+            meses_contados:
+              type: number
+              description: Cantidad de meses que se están o han contado para generar las ganancias mediante tasas/intereses
+              example: 12
+        estado:
+          type: string
+          description: Estado del certificado
+          example: Activo
+    CertificateDetailResponse:
+      type: object
+      properties:
+        status:
+          type: number
+          description: Http status code
+          example: 200
+        response:
+          type: object
+          description: Respuesta a la peticion hecha
+          properties:
+            certificado:
+              type: object
+              description: Certificado/s
+              $ref: '#/components/schemas/CertificateDetail'
+    ClientResponse:
+      type: object
+      properties:
+        status:
+          type: number
+          description: Http status code
+          example: 200
+        response:
+          type: object
+          description: Respuesta a la peticion hecha
+          properties:
+            cliente:
+              type: object
+              description: Cliente/s
+              $ref: '#/components/schemas/Client'
+    CertificateClientResponse:
+      type: object
+      properties:
+        status:
+          type: number
+          description: Http status code
+          example: 200
+        response:
+          type: object
+          description: Respuesta a la peticion hecha
+          properties:
+            certificado:
+              type: object
+              description: Certificado/s
+              $ref: '#/components/schemas/CertificateDetailClient'
+    NotFounResponse:
+      type: object
+      properties:
+        status:
+          type: number
+          description: Http status code
+          example: 404
+        response:
+          type: object
+          description: Respuesta a la peticion hecha
+          properties:
+            message:
+              type: string
+              description: Mensaje de error
+              example: No se encontró el objeto solicitado
+    WithdrawalResponse:
+      type: object
+      properties:
+        status:
+          type: number
+          description: Http status code
+          example: 201
+        response:
+          type: object
+          description: Respuesta a la peticion hecha
+          properties:
+            monto_retirado:
+              type: number
+              description: Total de dinero retirado (incluyendo la penalidad en caso de que no haya terminado el plazo del certificado)
+              example: 1000
+            penalidad:
+              type: number
+              description: Penalidad por retiro anticipado
+              example: 0.65
+            estado:
+              type: string
+              description: Estado del certificado
+              example: Activo
+            certificado:
+              type: object
+              description: Certificado/s
+              $ref: '#/components/schemas/CertificateDetail' 
